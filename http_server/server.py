@@ -1,28 +1,24 @@
 import asyncio
 
 http_response_template = \
-"""
-HTTP/1.1 200 OK
+"""HTTP/1.1 200 OK
 Content-Length: %d
 Content-Type: text/html
 
-%s
-"""
+%s"""
 
 async def handle_http(reader, writer):
-    request: str = await reader.readuntil("\n\n")
+    request = await reader.readuntil(b"\n")
 
-    if request.startswith("GET / "):
+    if request.startswith(b"GET / "):
         html = \
-        """
-        <html>
+        """<html>
             <body>
                 <h1>Hello!</h1>
             </body>
-        </html>
-        """
+        </html>"""
 
-        writer.write(http_response_template % (len(html.encode("utf-8")), html))
+        writer.write((http_response_template % (len(html.encode("utf-8")), html)).encode("utf-8"))
         await writer.drain()
 
     writer.close()
